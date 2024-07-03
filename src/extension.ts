@@ -26,12 +26,9 @@ export function activate(context: vscode.ExtensionContext) {
 		let pathSplitted: string[] = pathFromRoot.split(workspaceName);
 		let pathAfterWorkspace: string = pathSplitted[pathSplitted.length - 1];
 		let pathFromWorkspace: string = `${pathAfterWorkspace}`.slice(1);
-		vscode.window.showInformationMessage(workspacePath);
-		vscode.window.showInformationMessage(pathFromWorkspace);
 
 		const flutterCommand = `cd ${workspacePath} && flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${pathFromWorkspace}/*.dart"`;
         
-		vscode.window.showInformationMessage('Command: ' + flutterCommand);
 		vscode.window.showInformationMessage(`Generating data class... \n${pathFromWorkspace}/*.dart`);
 
 		exec(flutterCommand, (error, stdout, stderr) => {

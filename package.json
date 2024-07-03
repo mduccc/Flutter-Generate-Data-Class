@@ -2,7 +2,9 @@
   "name": "fluttergeneratedataclass",
   "displayName": "Flutter Generate Data Class",
   "description": "Flutter Generate Data Class",
-  "version": "1.0.0",
+  "repository": "https://github.com/mduccc/Flutter-Generate-Data-Class",
+  "version": "1.0.2",
+  "publisher": "mduccc",
   "engines": {
     "vscode": "^1.90.0"
   },
