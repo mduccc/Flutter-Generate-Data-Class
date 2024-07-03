@@ -1,9 +1,9 @@
 {
   "name": "fluttergeneratedataclass",
-  "displayName": "Flutter Generate Data Class",
-  "description": "Flutter Generate Data Class",
+  "displayName": "Flutter Generate Freezed Data Class",
+  "description": "Flutter Generate Freezed Data Class extension for VSCode",
   "repository": "https://github.com/mduccc/Flutter-Generate-Data-Class",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "publisher": "mduccc",
   "engines": {
     "vscode": "^1.90.0"
@@ -17,7 +17,7 @@
     "commands": [
       {
         "command": "fluttergeneratedataclass.genDartDataClass",
-        "title": "Generate Dart data class"
+        "title": "Generate Freezed Dart data class"
       }
     ],
     "menus": {
