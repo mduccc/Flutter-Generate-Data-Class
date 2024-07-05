@@ -21,15 +21,15 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	const disposable = vscode.commands.registerCommand('fluttergeneratedataclass.genDartDataClass', async (uri: vscode.Uri) => {
 		let pathFromRoot: string = uri.fsPath;
-		let pathContentPubspec = await checkSegmentsForPubspecYaml(pathFromRoot);
+		let pathContainPubspec = await checkSegmentsContainPubspec(pathFromRoot);
 		console.log('pathFromRoot', pathFromRoot);
-		console.log('pathContentPubspec', pathContentPubspec);
+		console.log('pathContentPubspec', pathContainPubspec);
 
-		let finalPath: string = removeLeadingSlashes(pathFromRoot.replace(`${pathContentPubspec}`, ''));
+		let finalPath: string = removeLeadingSlashes(pathFromRoot.replace(`${pathContainPubspec}`, ''));
 
 		console.log('finalPath', finalPath);
 
-		const flutterCommand: string = `cd ${pathContentPubspec} && flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${finalPath}/*.dart"`;
+		const flutterCommand: string = `cd ${pathContainPubspec} && flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${finalPath}/*.dart"`;
 
 		vscode.window.withProgress(
 			{
@@ -53,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 }
 
-async function checkSegmentsForPubspecYaml(fullPath: string) {
+async function checkSegmentsContainPubspec(fullPath: string) {
 	const segments: string[] = fullPath.split(path.sep);
 	let currentPath: string = '';
 	var pathsWithPubspec: string = '';
