@@ -1,6 +1,6 @@
 ### Flutter Generate Freezed Data Class extension for VSCode
 
-Generate Freezed data class in specific folder.
+Generate Freezed Data Class in specific folder.
 
 
 1. Right click on folder.
