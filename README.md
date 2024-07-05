@@ -2,8 +2,11 @@
 
 Generate Freezed Data Class in specific folder.
 
-
 1. Right click on folder.
-2. Select Generate Freezed Dart data class.
+2. Select Generate Freezed Data Class.
 
-<img src="https://i.imgur.com/t1Wn0nG.png" width=50%>
+
+<img src="https://i.imgur.com/siH1uoz.png" width=50%>
+<img src="https://i.imgur.com/CYHavda.png" width=50%>
+<img src="https://i.imgur.com/D28lUWf.png" width=50%>
+

@@ -35,13 +35,13 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.withProgress(
 			{
 				location: vscode.ProgressLocation.Notification,
-				title: `Generating Freezed data class...`,
+				title: `Generating Freezed Data Class...`,
 				cancellable: true
 			},
 			async (_, token) => {
 				token.onCancellationRequested(() => {
 					console.log('User canceled the long running operation');
-					vscode.window.showInformationMessage('Generate data class canceled');
+					vscode.window.showInformationMessage('Generate Freezed Data Class canceled');
 				});
 
 				return executeCommand(flutterCommand);
@@ -80,13 +80,13 @@ async function executeCommand(command: string) {
 		console.log('Standard Output:\n', stdout);
 		if (stderr) {
 			console.error('Standard Error:', stderr);
-			vscode.window.showInformationMessage(`Generate Freezed data class error: ${stderr}`);
+			vscode.window.showInformationMessage(`Generate Freezed Data Class error: ${stderr}`);
 		}
-		vscode.window.showInformationMessage('Generate Freezed data class success');
+		vscode.window.showInformationMessage('Generate Freezed Data Class success');
 	} catch (error) {
 		// Step 6: Error handling
 		console.error('Error executing command:', error);
-		vscode.window.showInformationMessage(`Generate Freezed data class error: ${error}`);
+		vscode.window.showInformationMessage(`Generate Freezed Data Class error: ${error}`);
 
 	}
 }
