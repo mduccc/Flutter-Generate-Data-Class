@@ -2,7 +2,6 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as fs from 'fs';
 import { promisify } from 'util';
 import { exec as execCallback } from 'child_process';
 
@@ -20,9 +19,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('fluttergeneratedataclass.genDartDataClass', (uri: vscode.Uri) => {
+	const disposable = vscode.commands.registerCommand('fluttergeneratedataclass.genDartDataClass', async (uri: vscode.Uri) => {
 		let pathFromRoot: string = uri.fsPath;
-		let pathContentPubspec = checkSegmentsForPubspecYaml(pathFromRoot);
+		let pathContentPubspec = await checkSegmentsForPubspecYaml(pathFromRoot);
 		console.log('pathFromRoot', pathFromRoot);
 		console.log('pathContentPubspec', pathContentPubspec);
 
@@ -54,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 }
 
-function checkSegmentsForPubspecYaml(fullPath: string) {
+async function checkSegmentsForPubspecYaml(fullPath: string) {
 	const segments: string[] = fullPath.split(path.sep);
 	let currentPath: string = '';
 	var pathsWithPubspec: string = '';
@@ -63,7 +62,9 @@ function checkSegmentsForPubspecYaml(fullPath: string) {
 		currentPath = path.join(currentPath, segment);
 		const pubspecPath = path.join(currentPath, 'pubspec.yaml');
 
-		if (fs.existsSync(pubspecPath)) {
+		var isExistPubspec = await checkFileExists(vscode.Uri.file(pubspecPath));
+
+		if (isExistPubspec) {
 			pathsWithPubspec = currentPath;
 		}
 	}
@@ -93,7 +94,19 @@ async function executeCommand(command: string) {
 
 function removeLeadingSlashes(path: string): string {
 	return path.replace(/^\/+/, '');
+}
+
+async function checkFileExists(uri: vscode.Uri): Promise<boolean> {
+  try {
+    await vscode.workspace.fs.stat(uri);
+    return true; // File exists
+  } catch (error) {
+    if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
+      return false; // File does not exist
+    }
+    throw error; // Rethrow other errors
   }
+}
 
 // This method is called when your extension is deactivated
 export function deactivate() { }
