@@ -4,6 +4,20 @@ All notable changes to the "fluttergeneratedataclass" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.1.0]
+ - Supports generating for nested packages
 
+## [1.0.4]
+ - Update meta data
+  
+## [1.0.3]
+ - Update meta data
+
+## [1.0.2]
+ - Update meta data
+
+## [1.0.1]
+ - Update meta data
+
+## [1.0.0]
 - Initial release

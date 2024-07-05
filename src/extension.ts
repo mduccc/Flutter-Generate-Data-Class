@@ -1,7 +1,13 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { exec } from 'child_process';
+import * as path from 'path';
+import * as fs from 'fs';
+import { promisify } from 'util';
+import { exec as execCallback } from 'child_process';
+
+const exec = promisify(execCallback);
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -15,34 +21,79 @@ export function activate(context: vscode.ExtensionContext) {
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	const disposable = vscode.commands.registerCommand('fluttergeneratedataclass.genDartDataClass', (uri: vscode.Uri) => {
-		let workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-		let workspaceName: string | undefined = workspaceFolder?.name;
-		let workspacePathSplitted: string[] | undefined = workspaceFolder?.uri.fsPath.split(workspaceName ?? '');
-		let workspacePath: string | undefined = `${workspacePathSplitted?.[0]}${workspaceName}`;
-		if (workspaceName == null || workspacePath == null) {
-			return;
-		}
 		let pathFromRoot: string = uri.fsPath;
-		let pathSplitted: string[] = pathFromRoot.split(workspaceName);
-		let pathAfterWorkspace: string = pathSplitted[pathSplitted.length - 1];
-		let pathFromWorkspace: string = `${pathAfterWorkspace}`.slice(1);
+		let pathContentPubspec = checkSegmentsForPubspecYaml(pathFromRoot);
+		console.log('pathFromRoot', pathFromRoot);
+		console.log('pathContentPubspec', pathContentPubspec);
 
-		const flutterCommand = `cd ${workspacePath} && flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${pathFromWorkspace}/*.dart"`;
-        
-		vscode.window.showInformationMessage(`Generating data class... \n${pathFromWorkspace}/*.dart`);
+		let finalPath: string = removeLeadingSlashes(pathFromRoot.replace(`${pathContentPubspec}`, ''));
 
-		exec(flutterCommand, (error, stdout, stderr) => {
-			if (error) {
-				vscode.window.showErrorMessage(`Generate data class error: ${stderr}`);
-				console.error(`exec error: ${error}`);
-				return;
+		console.log('finalPath', finalPath);
+
+		const flutterCommand: string = `cd ${pathContentPubspec} && flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${finalPath}/*.dart"`;
+
+		vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: `Generating Freezed data class...`,
+				cancellable: true
+			},
+			async (_, token) => {
+				token.onCancellationRequested(() => {
+					console.log('User canceled the long running operation');
+					vscode.window.showInformationMessage('Generate data class canceled');
+				});
+
+				return executeCommand(flutterCommand);
 			}
-			vscode.window.showInformationMessage('Generate data class completed');
-		});
+		);
+
+
 	});
 
 	context.subscriptions.push(disposable);
 }
+
+function checkSegmentsForPubspecYaml(fullPath: string) {
+	const segments: string[] = fullPath.split(path.sep);
+	let currentPath: string = '';
+	var pathsWithPubspec: string = '';
+
+	for (const segment of segments) {
+		currentPath = path.join(currentPath, segment);
+		const pubspecPath = path.join(currentPath, 'pubspec.yaml');
+
+		if (fs.existsSync(pubspecPath)) {
+			pathsWithPubspec = currentPath;
+		}
+	}
+
+	return pathsWithPubspec;
+}
+
+async function executeCommand(command: string) {
+	try {
+		// Step 4: Execute the command
+		const { stdout, stderr } = await exec(command);
+
+		// Step 5: Handle the output
+		console.log('Standard Output:\n', stdout);
+		if (stderr) {
+			console.error('Standard Error:', stderr);
+			vscode.window.showInformationMessage(`Generate Freezed data class error: ${stderr}`);
+		}
+		vscode.window.showInformationMessage('Generate Freezed data class success');
+	} catch (error) {
+		// Step 6: Error handling
+		console.error('Error executing command:', error);
+		vscode.window.showInformationMessage(`Generate Freezed data class error: ${error}`);
+
+	}
+}
+
+function removeLeadingSlashes(path: string): string {
+	return path.replace(/^\/+/, '');
+  }
 
 // This method is called when your extension is deactivated
 export function deactivate() { }
