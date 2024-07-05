@@ -69,7 +69,9 @@ async function checkSegmentsContainPubspec(fullPath: string) {
 		}
 	}
 
-	return pathsWithPubspec;
+	pathsWithPubspec = removeLeadingSlashes(pathsWithPubspec);
+
+	return `/${pathsWithPubspec}`;
 }
 
 async function executeCommand(command: string) {
@@ -97,15 +99,15 @@ function removeLeadingSlashes(path: string): string {
 }
 
 async function checkFileExists(uri: vscode.Uri): Promise<boolean> {
-  try {
-    await vscode.workspace.fs.stat(uri);
-    return true; // File exists
-  } catch (error) {
-    if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
-      return false; // File does not exist
-    }
-    throw error; // Rethrow other errors
-  }
+	try {
+		await vscode.workspace.fs.stat(uri);
+		return true; // File exists
+	} catch (error) {
+		if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
+			return false; // File does not exist
+		}
+		throw error; // Rethrow other errors
+	}
 }
 
 // This method is called when your extension is deactivated

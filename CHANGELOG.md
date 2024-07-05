@@ -4,6 +4,9 @@ All notable changes to the "fluttergeneratedataclass" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.3]
+ - Fix cannot select folder
+
 ## [1.1.2]
  - Switch to vscode.workspace.fs
 
