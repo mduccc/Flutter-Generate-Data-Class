@@ -13,7 +13,7 @@ const exec = promisify(execCallback);
 export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
+	// This line of code will only be executed once when your extension is activatedc
 	console.log('Congratulations, your extension "fluttergeneratedataclass" is now active!');
 
 	// The command has been defined in the package.json file
@@ -29,8 +29,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		console.log('finalPath', finalPath);
 
-		const flutterCommand: string = `cd ${pathContainPubspec} && flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${finalPath}/*.dart"`;
-
+		let flutterCommand: string = `cd ${pathContainPubspec} && flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${finalPath}/*.dart"`;
+		if (isWindows()) {
+			flutterCommand = `cd ${pathContainPubspec} ; flutter packages pub run build_runner build --delete-conflicting-outputs --build-filter="${finalPath}/*.dart"`;
+		}
 		vscode.window.withProgress(
 			{
 				location: vscode.ProgressLocation.Notification,
@@ -54,6 +56,40 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 async function checkSegmentsContainPubspec(fullPath: string) {
+	if (isWindows()) {
+		return checkSegmentsContainPubspecOnWindows(fullPath);
+	}
+
+	return checkSegmentsContainPubspecOnLinuxOrMacOS(fullPath);
+}
+
+async function checkSegmentsContainPubspecOnWindows(fullPath: string) {
+	const segments: string[] = fullPath.split(path.sep);
+	let currentPath: string = '';
+	var pathsWithPubspec: string = '';
+
+	for (const segment of segments) {
+		if (checkIsRootWindowsPath(segment)) {
+			currentPath = path.join(currentPath, `${segment}\\`);
+			continue;
+		} else {
+			currentPath = path.join(currentPath, segment);
+		}
+		const pubspecPath = path.join(currentPath, 'pubspec.yaml');
+
+		var isExistPubspec = await checkFileExists(vscode.Uri.file(pubspecPath));
+
+		if (isExistPubspec) {
+			pathsWithPubspec = currentPath;
+		}
+	}
+
+	pathsWithPubspec = removeLeadingSlashes(pathsWithPubspec);
+
+	return `${pathsWithPubspec}`;
+}
+
+async function checkSegmentsContainPubspecOnLinuxOrMacOS(fullPath: string) {
 	const segments: string[] = fullPath.split(path.sep);
 	let currentPath: string = '';
 	var pathsWithPubspec: string = '';
@@ -74,7 +110,38 @@ async function checkSegmentsContainPubspec(fullPath: string) {
 	return `/${pathsWithPubspec}`;
 }
 
+
+
 async function executeCommand(command: string) {
+	if (isWindows()) {
+		return executeCommandOnWindows(command);
+	}
+
+	return executeCommandOnLinuxOrMac(command);
+}
+
+
+async function executeCommandOnWindows(command: string) { 
+	try {
+		// Step 4: Execute the command
+		const { stdout, stderr } = await exec(`powershell.exe -Command ${command}`);
+
+		// Step 5: Handle the output
+		console.log('Standard Output:\n', stdout);
+		if (stderr) {
+			console.error('Standard Error:', stderr);
+			vscode.window.showInformationMessage(`Generate Freezed Data Class error: ${stderr}`);
+		}
+		vscode.window.showInformationMessage('Generate Freezed Data Class success');
+	} catch (error) {
+		// Step 6: Error handling
+		console.error('Error executing command:', error);
+		vscode.window.showInformationMessage(`Generate Freezed Data Class error: ${error}`);
+
+	}
+}
+
+async function executeCommandOnLinuxOrMac(command: string) {
 	try {
 		// Step 4: Execute the command
 		const { stdout, stderr } = await exec(command);
@@ -95,7 +162,7 @@ async function executeCommand(command: string) {
 }
 
 function removeLeadingSlashes(path: string): string {
-	return path.replace(/^\/+/, '');
+	return path.replace(/^[\/\\]+/, '');
 }
 
 async function checkFileExists(uri: vscode.Uri): Promise<boolean> {
@@ -108,6 +175,22 @@ async function checkFileExists(uri: vscode.Uri): Promise<boolean> {
 		}
 		throw error; // Rethrow other errors
 	}
+}
+
+function checkIsRootWindowsPath(path: string): boolean {
+	return /^[a-zA-Z]:$/.test(path);
+}
+
+function isWindows(): boolean {
+	return process.platform === 'win32';
+}
+
+function isMac(): boolean {
+	return process.platform === 'darwin';
+}
+
+function isLinux(): boolean {
+	return process.platform === 'linux';
 }
 
 // This method is called when your extension is deactivated
