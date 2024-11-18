@@ -3,7 +3,7 @@
   "displayName": "Flutter Generate Freezed Data Class",
   "description": "Flutter Generate Freezed Data Class extension for VSCode",
   "repository": "https://github.com/mduccc/Flutter-Generate-Data-Class",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "publisher": "mduccc",
   "engines": {
     "vscode": "^1.90.0"

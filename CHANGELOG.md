@@ -4,6 +4,9 @@ All notable changes to the "fluttergeneratedataclass" extension will be document
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.1.5]
+ - Update README
+
 ## [1.1.4]
  - Support Windows
 
